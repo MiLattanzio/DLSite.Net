@@ -3,7 +3,7 @@ namespace DLSite.Net.Crawler;
 public class Client
 {
     public HttpClient HttpClient { get; }
-    public Doujin Doujin { get; }
+    public Doujin.Client Doujin { get; }
     
     public Client()
     {
@@ -21,7 +21,7 @@ public class Client
         HttpClient.DefaultRequestHeaders.Add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
         HttpClient.DefaultRequestHeaders.Add("Accept-Language", "it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7");
         HttpClient.DefaultRequestHeaders.Add("Connection", "keep-alive");
-        Doujin = new Doujin(this);
+        Doujin = new Doujin.Client(this);
     }
     
 }

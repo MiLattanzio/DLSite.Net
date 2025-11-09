@@ -6,15 +6,25 @@ namespace DLSite.Net.Model.Doujin;
 
 public class AllSearchResultPage
 {
-    private HtmlDocument _page { get; } = new();
-    private JObject _pager { get; set; } = new();
+    private HtmlDocument Page { get; } = new();
+    private JObject Pager { get; set; } = new();
     
-
+    public List<AllSearchResultItem> Items { get; private set; } = new();
     public int TotalCount
     {
         get
         {
-            _pager.TryGetValue("count", out var total);
+            Pager.TryGetValue("count", out var total);
+            if (total is JValue jv) return jv.Value<int>();
+            return 0;
+        }
+    }
+    
+    public int CurrentPage
+    {
+        get
+        {
+            Pager.TryGetValue("page", out var total);
             if (total is JValue jv) return jv.Value<int>();
             return 0;
         }
@@ -24,7 +34,7 @@ public class AllSearchResultPage
     {
         get
         {
-            _pager.TryGetValue("last_page", out var total);
+            Pager.TryGetValue("last_page", out var total);
             if (total is JValue jv) return jv.Value<int>();
             return 0;
         }
@@ -32,13 +42,14 @@ public class AllSearchResultPage
 
     public AllSearchResultPage(string html)
     {
-        _page.LoadHtml(html);
+        Page.LoadHtml(html);
         ExtractPager();
+        ExtractItems();
     }
 
     private void ExtractPager()
     {
-        var node = _page.DocumentNode.SelectSingleNode("//*[@id=\"container\"]/script");
+        var node = Page.DocumentNode.SelectSingleNode("//*[@id=\"container\"]/script");
         if (null == node) return;
         var script = node.InnerText.Trim();
         
@@ -56,7 +67,7 @@ public class AllSearchResultPage
 
             try
             {
-                _pager = JObject.Parse(pagerJson);
+                Pager = JObject.Parse(pagerJson);
             }
             catch { /* ignora e prova altri script */ }
         }
@@ -118,5 +129,17 @@ public class AllSearchResultPage
             }
         }
         return null;
+    }
+
+    private void ExtractItems()
+    {
+        var liNodes = Page.DocumentNode.SelectNodes("//*[@id='search_result_img_box']/li");
+        
+        if (liNodes == null || liNodes.Count == 0)
+        {
+            return;
+        }
+        
+        Items = liNodes.Select(n => new AllSearchResultItem(n)).ToList();
     }
 }
