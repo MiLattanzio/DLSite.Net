@@ -35,5 +35,12 @@ public class Tests
         AllSearchResultPage? lastPage = null;
         Assert.DoesNotThrowAsync(async () => lastPage = await _client.Doujin.LastPage(page));
         Assert.That(lastPage, Is.Not.Null);
+        var lastItem = lastPage.Items.Last();
+        Assert.That(lastItem, Is.Not.Null);
+        AllSearchResultItemDetail? detail = null;
+        Assert.DoesNotThrowAsync(async () => detail = await _client.Doujin.Detail(lastItem));
+        Assert.That(detail, Is.Not.Null);
+        Assert.That(detail.Title, Is.Not.Empty);
+        Assert.That(detail.Circle, Is.Not.Empty);
     }
 }

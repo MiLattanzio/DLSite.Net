@@ -47,4 +47,12 @@ public class Client
     {
         return await Page(page, page.PageCount);   
     }
+    
+    public async Task<AllSearchResultItemDetail> Detail(AllSearchResultItem item)
+    {
+        var result = await _client.HttpClient.GetAsync(item.DetailUrl);
+        if (!result.IsSuccessStatusCode) throw new SearchFailedException(result);
+        var html = await result.Content.ReadAsStringAsync();
+        return new AllSearchResultItemDetail(html);
+    }
 }
